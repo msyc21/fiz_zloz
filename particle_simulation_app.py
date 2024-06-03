@@ -196,10 +196,10 @@ min_pos = 0
 max_pos = 0.35 if left_side_only else 1.0
 min_speed = -1
 max_speed = 1.0
-T_L = st.sidebar.slider("Temperature of particles on the left", min_value=0, max_value=500, value=273, step=20)
-T_R = st.sidebar.slider("Temperature of particles on the right", min_value=0, max_value=500, value=273, step=20)
+T_L = st.sidebar.slider("Temperature of particles on the left", min_value=0, max_value=500, value=20, step=20)
+T_R = st.sidebar.slider("Temperature of particles on the right", min_value=0, max_value=500, value=500, step=20)
 dt = st.sidebar.slider("Time step: dt (s)", min_value=0.01, max_value=0.2, value=0.1, step=0.01)
-total_time = st.sidebar.slider("Total Simulation Time (s)", min_value=0.1, max_value=5.0, value=1.0, step=0.1)
+total_time = st.sidebar.slider("Total Simulation Time (s)", min_value=0.1, max_value=5.0, value=5.0, step=0.1)
 
 if st.sidebar.button("Run Simulation"):
     positions = generuj_czastki(N, min_pos, max_pos, rounding=3)
