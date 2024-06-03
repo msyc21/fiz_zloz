@@ -203,7 +203,7 @@ st.markdown("""
 # Sidebar to change simulation parameters
 st.sidebar.title("Simulation Parameters")
 N = st.sidebar.slider("Number of Particles", min_value=10, max_value=500, value=100, step=10)
-left_side_only = st.sidebar.checkbox("One side generator", value=True)
+left_side_only = st.sidebar.checkbox("One side particles on start", value=True)
 min_pos = 0
 max_pos = 0.35 if left_side_only else 1.0
 min_speed = -1
