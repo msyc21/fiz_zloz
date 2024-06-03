@@ -5,7 +5,7 @@
 ## Open simulation
 
 - [ ] [Ideal Gas Entropy simulator](https://fizzloz-nax32pururau4hwjqfvevt.streamlit.app/) 
-- [ ] Simple grid particles -- *soon*
+- [ ] [Simple grid particles](https://fizzloz-uiryavhtych4utqxhraraj.streamlit.app/)
 
 ## Authors and acknowledgment
 - [ ] Marcin Syc
@@ -16,4 +16,4 @@
  GPL-3.0 license 
 
 ## Project status
- First version v0.1 with one uploaded model
+ Version v0.2 with two uploaded models
