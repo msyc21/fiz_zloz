@@ -9,25 +9,32 @@ from scipy.stats import rayleigh
 # Initialize global lists for particles and velocities
 V_R, V_L, N_L, N_R, S = [], [], [], [], []
 
-def generuj_czastki(N, min, max, rounding):
-    return np.random.uniform(min, max, (2, N)).round(rounding)
+
+def generuj_czastki(num_particles, min=0, max=1, rounding=2):
+    positionsX = np.random.uniform(min, max, num_particles).round(rounding)
+    positionsY = np.random.uniform(min, 1., num_particles).round(rounding)
+    positions = np.vstack((positionsX, positionsY))
+    return positions
+
 
 def generate_velocity_matrix(num_particles, min_speed=-1, max_speed=1):
     return np.random.uniform(low=min_speed, high=max_speed, size=(2, num_particles))
+
 
 def generate_velocity_matrix2(num_particles, positions, T_L, T_R):
     m = 1.67 * 10 ** (-27)
     k = 1.38 * 10 ** (-23)
     sigmaL = np.sqrt(k * T_L / m)
     sigmaR = np.sqrt(k * T_R / m)
-    speedsL = 0.001*rayleigh.rvs(scale = sigmaL, size=num_particles)
-    speedsR = 0.001*rayleigh.rvs(scale = sigmaR, size=num_particles)
+    speedsL = 0.001 * rayleigh.rvs(scale=sigmaL, size=num_particles)
+    speedsR = 0.001 * rayleigh.rvs(scale=sigmaR, size=num_particles)
     speeds = np.where(positions[0, :] >= 0.5, speedsR, speedsL)
     velocities = np.zeros(shape=(2, num_particles))
-    angles = 2*np.pi*np.random.rand(num_particles)
-    velocities[0, :] = speeds*np.cos(angles)
-    velocities[1, :] = speeds*np.sin(angles)
+    angles = 2 * np.pi * np.random.rand(num_particles)
+    velocities[0, :] = speeds * np.cos(angles)
+    velocities[1, :] = speeds * np.sin(angles)
     return velocities
+
 
 def bound_collision(N, positions, velocities):
     n_collision = 0
@@ -38,6 +45,7 @@ def bound_collision(N, positions, velocities):
                 n_collision += 1
     return velocities, n_collision
 
+
 def collisions(positions):
     N = positions.shape[1]
     collision_matrix = np.zeros((N, N), dtype=bool)
@@ -46,6 +54,7 @@ def collisions(positions):
             if np.linalg.norm(positions[:, i] - positions[:, j]) < 0.02:
                 collision_matrix[i, j] = collision_matrix[j, i] = True
     return collision_matrix
+
 
 def resolve_collision(pos1, vel1, pos2, vel2):
     normal = pos2 - pos1
@@ -63,6 +72,7 @@ def resolve_collision(pos1, vel1, pos2, vel2):
     vel2_new = vel2_normal * normal + vel2_tangent * tangent
 
     return vel1_new, vel2_new
+
 
 def animate_particle_movement(positions, velocities, dt, total_time):
     global N_R, N_L, V_R, V_L, S
@@ -102,7 +112,8 @@ def animate_particle_movement(positions, velocities, dt, total_time):
         for i in range(N):
             for j in range(i + 1, N):
                 if collision_matrix[i, j]:
-                    velocities[:, i], velocities[:, j] = resolve_collision(positions[:, i], velocities[:, i], positions[:, j], velocities[:, j])
+                    velocities[:, i], velocities[:, j] = resolve_collision(positions[:, i], velocities[:, i],
+                                                                           positions[:, j], velocities[:, j])
 
         particles.set_offsets(positions.T)
 
@@ -130,7 +141,7 @@ def animate_particle_movement(positions, velocities, dt, total_time):
         V_L.append(avg_vel_total_left)
 
         num_right = max(num_right, 1)  # Prevent log(0)
-        num_left = max(num_left, 1)    # Prevent log(0)
+        num_left = max(num_left, 1)  # Prevent log(0)
         S_value = N * np.log(N) - num_right * np.log(num_right) - (N - num_right) * np.log(N - num_right)
         S.append(S_value)
 
@@ -139,7 +150,7 @@ def animate_particle_movement(positions, velocities, dt, total_time):
         ax1.plot(N_R, "-", color="red", label="N_R")
         ax1.set_xlim(0, total_time / dt)
         ax1.set_ylim(0, N)
-        ax1.axhline(y=N/2, color='purple', linestyle='--')
+        ax1.axhline(y= N / 2, color='purple', linestyle='--')
         ax1.set_title("Number of Particles")
         ax1.legend()
 
@@ -154,9 +165,9 @@ def animate_particle_movement(positions, velocities, dt, total_time):
         ax3.clear()
         ax3.plot(S, color="red")
         ax3.set_xlim(0, total_time / dt)
-        ax3.set_ylim(0, N * np.log(2)+5)
+        ax3.set_ylim(0, N * np.log(2) + 5)
         ax3.set_ylabel(r"$\Delta S$/k")
-        ax3.axhline(y=N * np.log(2), color='purple', linestyle='--', label = r"N$\log2$")
+        ax3.axhline(y=N * np.log(2), color='purple', linestyle='--', label=r"N$\log2$")
         ax3.set_title("Entropy")
         ax3.legend()
 
@@ -169,6 +180,7 @@ def animate_particle_movement(positions, velocities, dt, total_time):
 
     html_str = ani.to_jshtml()
     return html_str
+
 
 st.title("Particle Simulation")
 
