@@ -4,20 +4,29 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.gridspec import GridSpec
 import streamlit as st
 import streamlit.components.v1 as components
+from scipy.stats import rayleigh
 
 # Initialize global lists for particles and velocities
-V_R = []
-V_L = []
-N_L = []
-N_R = []
-S = []
+V_R, V_L, N_L, N_R, S = [], [], [], [], []
 
 def generuj_czastki(N, min, max, rounding):
-    positions = np.random.uniform(min, max, (2, N)).round(rounding)
-    return positions
+    return np.random.uniform(min, max, (2, N)).round(rounding)
 
 def generate_velocity_matrix(num_particles, min_speed=-1, max_speed=1):
-    velocities = np.random.uniform(low=min_speed, high=max_speed, size=(2, num_particles))
+    return np.random.uniform(low=min_speed, high=max_speed, size=(2, num_particles))
+
+def generate_velocity_matrix2(num_particles, positions, T_L, T_R):
+    m = 1.67 * 10 ** (-27)
+    k = 1.38 * 10 ** (-23)
+    sigmaL = np.sqrt(k * T_L / m)
+    sigmaR = np.sqrt(k * T_R / m)
+    speedsL = 0.001*rayleigh.rvs(scale = sigmaL, size=num_particles)
+    speedsR = 0.001*rayleigh.rvs(scale = sigmaR, size=num_particles)
+    speeds = np.where(positions[0, :] >= 0.5, speedsR, speedsL)
+    velocities = np.zeros(shape=(2, num_particles))
+    angles = 2*np.pi*np.random.rand(num_particles)
+    velocities[0, :] = speeds*np.cos(angles)
+    velocities[1, :] = speeds*np.sin(angles)
     return velocities
 
 def bound_collision(N, positions, velocities):
@@ -31,13 +40,12 @@ def bound_collision(N, positions, velocities):
 
 def collisions(positions):
     N = positions.shape[1]
-    collisions = np.zeros((N, N), dtype=bool)
+    collision_matrix = np.zeros((N, N), dtype=bool)
     for i in range(N):
         for j in range(i + 1, N):
             if np.linalg.norm(positions[:, i] - positions[:, j]) < 0.02:
-                collisions[i, j] = True
-                collisions[j, i] = True
-    return collisions
+                collision_matrix[i, j] = collision_matrix[j, i] = True
+    return collision_matrix
 
 def resolve_collision(pos1, vel1, pos2, vel2):
     normal = pos2 - pos1
@@ -67,8 +75,8 @@ def animate_particle_movement(positions, velocities, dt, total_time):
     ax2 = fig.add_subplot(gs[2, 0])
     ax3 = fig.add_subplot(gs[1:, 1])
 
-    ax0.set_xlim(0, 1.01)
-    ax0.set_ylim(0, 1.01)
+    ax0.set_xlim(0, 1.1)
+    ax0.set_ylim(0, 1.1)
     ax0.set_xlabel('X')
     ax0.set_ylabel('Y')
     ax0.set_title('Particle Movement')
@@ -109,11 +117,17 @@ def animate_particle_movement(positions, velocities, dt, total_time):
         text_right.set_text('Particles on the right: {}'.format(num_right))
         text_left.set_text('Particles on the left: {}'.format(num_left))
 
-        avg_velocity_right = np.mean(velocities[0, positions[0, :] > 0.5]**2) if np.sum(positions[0, :] > 0.5) > 0 else 0
-        avg_velocity_left = np.mean(velocities[0, positions[0, :] <= 0.5]**2) if np.sum(positions[0, :] <= 0.5) > 0 else 0
+        # avg_velocity_right = np.mean(velocities[0, positions[0, :] > 0.5]**2) if np.sum(positions[0, :] > 0.5) > 0 else 0
+        # avg_velocity_left = np.mean(velocities[0, positions[0, :] <= 0.5]**2) if np.sum(positions[0, :] <= 0.5) > 0 else 0
+        # V_R.append(avg_velocity_right)
+        # V_L.append(avg_velocity_left)
+        vel_total = velocities[0, :] ** 2 + velocities[1, :] ** 2
 
-        V_R.append(avg_velocity_right)
-        V_L.append(avg_velocity_left)
+        avg_vel_total_right = np.mean(vel_total[positions[0, :] > 0.5])
+        avg_vel_total_left = np.mean(vel_total[positions[0, :] <= 0.5])
+
+        V_R.append(avg_vel_total_right)
+        V_L.append(avg_vel_total_left)
 
         num_right = max(num_right, 1)  # Prevent log(0)
         num_left = max(num_left, 1)    # Prevent log(0)
@@ -121,28 +135,28 @@ def animate_particle_movement(positions, velocities, dt, total_time):
         S.append(S_value)
 
         ax1.clear()
-        ax1.plot(N_L, ".", color="green", label="N_L")
-        ax1.plot(N_R, ".", color="red", label="N_R")
+        ax1.plot(N_L, "-", color="green", label="N_L")
+        ax1.plot(N_R, "-", color="red", label="N_R")
         ax1.set_xlim(0, total_time / dt)
         ax1.set_ylim(0, N)
-        ax1.axhline(y=N / 2, color='purple', linestyle='--')
+        ax1.axhline(y=N/2, color='purple', linestyle='--')
         ax1.set_title("Number of Particles")
         ax1.legend()
 
         ax2.clear()
-        ax2.plot(V_L, ".", color="green", label="V_L^2")
-        ax2.plot(V_R, ".", color="red", label="V_R^2")
+        ax2.plot(V_L, "-", color="green", label="V_L^2")
+        ax2.plot(V_R, "-", color="red", label="V_R^2")
         ax2.set_xlim(0, total_time / dt)
-        ax2.set_ylim(0, 1)
+        ax2.set_ylim(0, np.max(vel_total))
         ax2.set_title("Velocity Squared")
         ax2.legend()
 
         ax3.clear()
         ax3.plot(S, color="red")
         ax3.set_xlim(0, total_time / dt)
-        ax3.set_ylim(0, N * np.log(2) + 5)
-        ax3.set_ylabel(r"$\Delta S$")
-        ax3.axhline(y=N * np.log(2), color='purple', linestyle='--', label=r"N$\log2$")
+        ax3.set_ylim(0, N * np.log(2)+5)
+        ax3.set_ylabel(r"$\Delta S$/k")
+        ax3.axhline(y=N * np.log(2), color='purple', linestyle='--', label = r"N$\log2$")
         ax3.set_title("Entropy")
         ax3.legend()
 
@@ -174,17 +188,22 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-N = 100
+# Sidebar to change simulation parameters
+st.sidebar.title("Simulation Parameters")
+N = st.sidebar.slider("Number of Particles", min_value=10, max_value=500, value=100, step=10)
+left_side_only = st.sidebar.checkbox("One side generator", value=True)
 min_pos = 0
-max_pos = 0.4
+max_pos = 0.35 if left_side_only else 1.0
 min_speed = -1
 max_speed = 1.0
-dt = 0.1
-total_time = 5.0
+T_L = st.sidebar.slider("Temperature of particles on the left", min_value=0, max_value=500, value=273, step=20)
+T_R = st.sidebar.slider("Temperature of particles on the right", min_value=0, max_value=500, value=273, step=20)
+dt = st.sidebar.slider("Time step: dt (s)", min_value=0.01, max_value=0.2, value=0.1, step=0.01)
+total_time = st.sidebar.slider("Total Simulation Time (s)", min_value=0.1, max_value=5.0, value=1.0, step=0.1)
 
-positions = generuj_czastki(N, min_pos, max_pos, rounding=3)
-velocities = generate_velocity_matrix(N, min_speed=min_speed, max_speed=max_speed)
+if st.sidebar.button("Run Simulation"):
+    positions = generuj_czastki(N, min_pos, max_pos, rounding=3)
+    velocities = generate_velocity_matrix2(N, positions, T_L=T_L, T_R=T_R)
 
-animation_html = animate_particle_movement(positions, velocities, dt, total_time)
-
-components.html(animation_html, height=1200, scrolling=False)
+    animation_html = animate_particle_movement(positions, velocities, dt, total_time)
+    components.html(animation_html, height=1000, scrolling=False)
