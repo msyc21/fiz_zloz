@@ -85,8 +85,8 @@ def animate_particle_movement(positions, velocities, dt, total_time):
     ax2 = fig.add_subplot(gs[2, 0])
     ax3 = fig.add_subplot(gs[1:, 1])
 
-    ax0.set_xlim(0, 1.1)
-    ax0.set_ylim(0, 1.1)
+    ax0.set_xlim(-0.02, 1.02)
+    ax0.set_ylim(-0.02, 1.02)
     ax0.set_xlabel('X')
     ax0.set_ylabel('Y')
     ax0.set_title('Particle Movement')
