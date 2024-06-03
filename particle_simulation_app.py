@@ -147,7 +147,7 @@ def animate_particle_movement(positions, velocities, dt, total_time):
         ax2.plot(V_L, "-", color="green", label="V_L^2")
         ax2.plot(V_R, "-", color="red", label="V_R^2")
         ax2.set_xlim(0, total_time / dt)
-        ax2.set_ylim(0, np.max(vel_total))
+        ax2.set_ylim(0, 0.5*np.max(vel_total))
         ax2.set_title("Velocity Squared")
         ax2.legend()
 
