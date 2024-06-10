@@ -42,12 +42,12 @@ def update_positions(pos, dir, grid_size):
         if pos[0, i] < 0:
             pos[0, i] = 0
         elif pos[0, i] >= grid_size:
-            pos[0, i] = grid_size - 1
+            pos[0, i] = grid_size
 
         if pos[1, i] < 0:
             pos[1, i] = 0
         elif pos[1, i] >= grid_size:
-            pos[1, i] = grid_size - 1
+            pos[1, i] = grid_size
 
 def animate_particle_movement(pos, dir, grid_size, total_steps, dt):
     global N_R, N_L, S, p
@@ -126,7 +126,7 @@ st.title("Grid Gas Simulation")
 st.markdown("""
     <style>
         .main .block-container {
-            max-width: 60%;
+            max-width: 90%;
             padding: 2rem;
         }
         .css-1v3fvcr {
@@ -138,9 +138,9 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-N = st.sidebar.slider("Number of particles", min_value=1, max_value=100, value=10)
+N = st.sidebar.slider("Number of particles", min_value=1, max_value=101, value=19, step=2)
 grid_size = st.sidebar.slider("Grid size", min_value=5, max_value=20, value=10)
-total_steps = st.sidebar.slider("Total steps", min_value=50, max_value=500, value=100)
+total_steps = st.sidebar.slider("Total steps", min_value=50, max_value=1000, value=100)
 dt = st.sidebar.slider("Time step (dt)", min_value=1, max_value=10, value=1)
 
 poss = pos_init(N)
