@@ -138,9 +138,9 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-N = st.sidebar.slider("Number of particles", min_value=1, max_value=101, value=19, step=2)
-grid_size = st.sidebar.slider("Grid size", min_value=5, max_value=20, value=10)
-total_steps = st.sidebar.slider("Total steps", min_value=50, max_value=1000, value=100)
+N = st.sidebar.slider("Number of particles", min_value=1, max_value=100, value=12)
+grid_size = st.sidebar.slider("Grid size", min_value=5, max_value=15, value=10)
+total_steps = st.sidebar.slider("Total steps", min_value=50, max_value=500, value=100)
 dt = st.sidebar.slider("Time step (dt)", min_value=1, max_value=10, value=1)
 
 poss = pos_init(N)
