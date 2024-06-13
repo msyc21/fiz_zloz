@@ -30,24 +30,39 @@ def update_positions(pos, dir, grid_size):
         dir[i] = np.random.choice(4)  # Random direction at each step
 
         if dir[i] == 0:  # Up
-            pos[1, i] += 1
+            if pos[1, i] >= grid_size:
+                pos[1, i] = grid_size
+            else:
+                pos[1, i] += 1
+
         elif dir[i] == 1:  # Down
-            pos[1, i] -= 1
+            if pos[1, i] <= 0:
+                pos[1, i] = 0
+            else:
+                pos[1, i] -= 1
+
         elif dir[i] == 2:  # Left
-            pos[0, i] -= 1
+            if pos[0, i] <= 0:
+                pos[0, i] = 0
+            else:
+                pos[0, i] -= 1
+
         elif dir[i] == 3:  # Right
-            pos[0, i] += 1
-
-        # Reflecting off walls
-        if pos[0, i] < 0:
-            pos[0, i] = 0
-        elif pos[0, i] >= grid_size:
-            pos[0, i] = grid_size
-
-        if pos[1, i] < 0:
-            pos[1, i] = 0
-        elif pos[1, i] >= grid_size:
-            pos[1, i] = grid_size
+            if pos[0, i] >= grid_size:
+                pos[0, i] = grid_size
+            else:
+                pos[0, i] += 1
+        #
+        # # Reflecting off walls
+        # if pos[0, i] < 0:
+        #     pos[0, i] = 0
+        # elif pos[0, i] >= grid_size:
+        #     pos[0, i] = grid_size
+        #
+        # if pos[1, i] < 0:
+        #     pos[1, i] = 0
+        # elif pos[1, i] >= grid_size:
+        #     pos[1, i] = grid_size
 
 def animate_particle_movement(pos, dir, grid_size, total_steps, dt):
     global N_R, N_L, S, p
@@ -81,7 +96,8 @@ def animate_particle_movement(pos, dir, grid_size, total_steps, dt):
         N_L.append(num_left)
         N_R.append(num_right)
 
-        S_value = np.log(silnia(N) / (silnia(num_left) * silnia(num_right)))
+        # S_value = np.log(silnia(N) / (silnia(num_left) * silnia(num_right)))
+        S_value = N * np.log(N) - num_right * np.log(num_right) - (N - num_right) * np.log(N - num_right)
         S.append(S_value)
 
         p_value = (num_left - num_right) / N
@@ -90,10 +106,16 @@ def animate_particle_movement(pos, dir, grid_size, total_steps, dt):
         ax1.clear()
         ax1.plot(N_L, "-", color="green", label="N_L")
         ax1.plot(N_R, "-", color="red", label="N_R")
+        ax1.plot(np.arange(0, total_steps/dt), N*0.5*(1+np.exp(-(2*(1/4)/grid_size)*np.arange(0, total_steps/dt))),
+                 color='green', linestyle='dashed', alpha=0.6, label = r"$N_{L}(t)$")
+        ax1.plot(np.arange(0, total_steps / dt),
+                 N * 0.5 * (1 - np.exp(-(2 * (1 / 4) / grid_size) * np.arange(0, total_steps / dt))),
+                 color='red', linestyle='dashed', alpha=0.6, label=r"$N_{R}(t)$")
         ax1.set_xlim(0, total_steps / dt)
         ax1.set_ylim(-0.5, N+0.5)
-        ax1.axhline(y= N / 2, color='purple', linestyle='--', label="N/2")
-        ax1.legend()
+        ax1.set_ylabel(r"$\frac{N}{2}$")
+        ax1.axhline(y= N / 2, color='purple', linestyle='--')
+        ax1.legend(bbox_to_anchor=(1.0, 1.0), loc='upper right')
 
         ax2.clear()
         ax2.plot(p, "-", color="green", label=r"$\frac{N_L - N_R}{N}$")
@@ -102,13 +124,18 @@ def animate_particle_movement(pos, dir, grid_size, total_steps, dt):
         ax2.set_ylim(-1, 1)
         ax2.set_ylabel("p")
         ax2.legend()
-
+        t = np.arange(0, total_steps/dt)
         ax3.clear()
         ax3.plot(S, "-", color="red", label = r"$\log(\frac{N!}{N_R!N_L!})$")
+        ax3.plot(N*np.log(2) - (N/2)*((1 + np.exp(-(2 * (1 / 4) / grid_size) * t))*np.log((1 + np.exp(-(2 * (1 / 4) / grid_size) * t)))+
+                                      (1 - np.exp(-(2 * (1 / 4) / grid_size) * t))*np.log((1 - np.exp(-(2 * (1 / 4) / grid_size) * t)))),
+                 '--', color='black', alpha = 0.6)
         ax3.set_xlim(0, total_steps / dt)
-        ax3.set_ylim(0, np.log(silnia(N) / (silnia(N/2) * silnia(N/2)))+1)
-        ax3.axhline(y=np.log(silnia(N) / (silnia(N/2) * silnia(N/2))), color='purple', linestyle='--', label=r"$N_{L} = \frac{N}{2}$")
-        ax3.set_ylabel(r"$\sigma $")
+        # ax3.set_ylim(0, np.log(silnia(N) / (silnia(N/2) * silnia(N/2)))+1)
+        ax3.set_ylim(0, N * np.log(2) + 1)
+        # ax3.axhline(y=np.log(silnia(N) / (silnia(N/2) * silnia(N/2))), color='purple', linestyle='--', label=r"$N_{L} = \frac{N}{2}$")
+        ax3.axhline(y = N * np.log(2), color='purple', linestyle='--', label=r"N$\log2$")
+        ax3.set_ylabel("Entropy")
         ax3.legend()
 
         return particles,
