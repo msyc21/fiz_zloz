@@ -106,10 +106,10 @@ def animate_particle_movement(pos, dir, grid_size, total_steps, dt):
         ax1.clear()
         ax1.plot(N_L, "-", color="green", label="N_L")
         ax1.plot(N_R, "-", color="red", label="N_R")
-        ax1.plot(np.arange(0, total_steps/dt), N*0.5*(1+np.exp(-(2*(1/4)/grid_size)*np.arange(0, total_steps/dt))),
+        ax1.plot(np.arange(0, total_steps/dt), N*0.5*(1+np.exp(-(2*(1/4)/grid_size/2)*np.arange(0, total_steps/dt))),
                  color='green', linestyle='dashed', alpha=0.6, label = r"$N_{L}(t)$")
         ax1.plot(np.arange(0, total_steps / dt),
-                 N * 0.5 * (1 - np.exp(-(2 * (1 / 4) / grid_size) * np.arange(0, total_steps / dt))),
+                 N * 0.5 * (1 - np.exp(-(2 * (1 / 4) / grid_size/2) * np.arange(0, total_steps / dt))),
                  color='red', linestyle='dashed', alpha=0.6, label=r"$N_{R}(t)$")
         ax1.set_xlim(0, total_steps / dt)
         ax1.set_ylim(-0.5, N+0.5)
@@ -127,8 +127,8 @@ def animate_particle_movement(pos, dir, grid_size, total_steps, dt):
         t = np.arange(0, total_steps/dt)
         ax3.clear()
         ax3.plot(S, "-", color="red", label = r"$\log(\frac{N!}{N_R!N_L!})$")
-        ax3.plot(N*np.log(2) - (N/2)*((1 + np.exp(-(2 * (1 / 4) / grid_size) * t))*np.log((1 + np.exp(-(2 * (1 / 4) / grid_size) * t)))+
-                                      (1 - np.exp(-(2 * (1 / 4) / grid_size) * t))*np.log((1 - np.exp(-(2 * (1 / 4) / grid_size) * t)))),
+        ax3.plot(N*np.log(2) - (N/2)*((1 + np.exp(-(2 * (1 / 4) / grid_size/2) * t))*np.log((1 + np.exp(-(2 * (1 / 4) / grid_size/2) * t)))+
+                                      (1 - np.exp(-(2 * (1 / 4) / grid_size/2) * t))*np.log((1 - np.exp(-(2 * (1 / 4) / grid_size/2) * t)))),
                  '--', color='black', alpha = 0.6)
         ax3.set_xlim(0, total_steps / dt)
         # ax3.set_ylim(0, np.log(silnia(N) / (silnia(N/2) * silnia(N/2)))+1)
