@@ -152,12 +152,12 @@ def animate_particle_movement(positions, velocities, dt, total_time):
         ax1.plot(N_R, "-", color="red", label="N_R")
         ax1.set_xlim(0, total_time / dt)
         ax1.set_ylim(0, N)
-        ax1.plot(t,
-                 N * 0.5 * (1 + np.exp(-(2 * (1 / 10) / 1) * t)),
-                 color='green', linestyle='dashed', alpha=0.6, label=r"$N_{L}(t)$")
-        ax1.plot(t,
-                 N * 0.5 * (1 - np.exp(-(2 * (1 / 10) / 1) * t)),
-                 color='red', linestyle='dashed', alpha=0.6, label=r"$N_{R}(t)$")
+        # ax1.plot(t,
+        #          N * 0.5 * (1 + np.exp(-(2 * (1 / 10) / 1) * t)),
+        #          color='green', linestyle='dashed', alpha=0.6, label=r"$N_{L}(t)$")
+        # ax1.plot(t,
+        #          N * 0.5 * (1 - np.exp(-(2 * (1 / 10) / 1) * t)),
+        #          color='red', linestyle='dashed', alpha=0.6, label=r"$N_{R}(t)$")
         ax1.axhline(y= N / 2, color='purple', linestyle='--')
         ax1.set_title("Number of Particles")
         ax1.legend()
@@ -177,11 +177,11 @@ def animate_particle_movement(positions, velocities, dt, total_time):
         ax3.set_ylim(0, N * np.log(2) + 5)
         ax3.set_ylabel(r"$\Delta S$/k")
         ax3.axhline(y=N * np.log(2), color='purple', linestyle='--', label=r"N$\log2$")
-        ax3.plot(N * np.log(2) - (N / 2) * ((1 + np.exp(-(2 * (1 / 10) / 1) * t)) * np.log(
-            (1 + np.exp(-(2 * (1 / 10) / 1) * t))) +
-                                            (1 - np.exp(-(2 * (1 / 10) / 1) * t)) * np.log(
-                    (1 - np.exp(-(2 * (1 / 10) / 1) * t)))),
-                 '--', color='black', alpha=0.6)
+        # ax3.plot(N * np.log(2) - (N / 2) * ((1 + np.exp(-(2 * (1 / 10) / 1) * t)) * np.log(
+        #     (1 + np.exp(-(2 * (1 / 10) / 1) * t))) +
+        #                                     (1 - np.exp(-(2 * (1 / 10) / 1) * t)) * np.log(
+        #             (1 - np.exp(-(2 * (1 / 10) / 1) * t)))),
+        #          '--', color='black', alpha=0.6)
         ax3.set_title("Entropy")
         ax3.legend()
 
