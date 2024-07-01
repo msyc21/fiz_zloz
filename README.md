@@ -16,4 +16,4 @@
  GPL-3.0 license 
 
 ## Project status
- Version v0.2 with two uploaded models
+ Version v1.0 with two uploaded models
